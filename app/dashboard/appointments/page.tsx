@@ -9,6 +9,8 @@ import { addDaysISO, formatDate } from "@/lib/utils";
 import type { AppointmentStatus } from "@/types";
 import { AppointmentCard } from "@/components/dashboard/appointment-card";
 import { RescheduleDialog } from "@/components/dashboard/reschedule-dialog";
+import { NewAppointmentDialog } from "@/components/dashboard/new-appointment-dialog";
+import { OpenSlotDialog } from "@/components/dashboard/open-slot-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -42,15 +44,14 @@ export default function AppointmentsPage() {
 
   const today = addDaysISO(0);
   const rangeEnd = range === "day" ? today : range === "week" ? addDaysISO(6) : addDaysISO(29);
-  const rangeStart = addDaysISO(-30);
 
   const filtered = useMemo(() => {
     return appointments
-      .filter((a) => (range === "day" ? a.date === today : a.date >= rangeStart && a.date <= rangeEnd))
+      .filter((a) => (range === "day" ? a.date === today : a.date >= today && a.date <= rangeEnd))
       .filter((a) => statusFilter === "all" || a.status === statusFilter)
       .filter((a) => a.patientName.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  }, [appointments, range, statusFilter, search, today, rangeEnd, rangeStart]);
+  }, [appointments, range, statusFilter, search, today, rangeEnd]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, typeof filtered>();
@@ -82,14 +83,18 @@ export default function AppointmentsPage() {
           </TabsList>
         </Tabs>
 
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
-          <Input
-            placeholder="Search patient…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="ps-9"
-          />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
+            <Input
+              placeholder="Search patient…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="ps-9"
+            />
+          </div>
+          <OpenSlotDialog />
+          <NewAppointmentDialog />
         </div>
       </div>
 

@@ -240,7 +240,10 @@ export function BookingFlow({ initialServiceId }: { initialServiceId?: string })
                     return (
                       <button
                         key={s.id}
-                        onClick={() => setServiceId(s.id)}
+                        onClick={() => {
+                          setServiceId(s.id);
+                          setTimeout(() => setStep(2), 300);
+                        }}
                         className={cn(
                           "flex items-start gap-3 rounded-2xl border p-4 text-start transition-colors",
                           active ? "border-[var(--navy)] bg-[var(--secondary)]/60" : "border-[var(--border)] hover:border-[var(--navy)]/30"

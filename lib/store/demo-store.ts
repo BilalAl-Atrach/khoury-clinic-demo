@@ -5,6 +5,7 @@ import type {
   Appointment,
   FollowUp,
   Locale,
+  OpenSlot,
   Patient,
   WebsiteSettings,
   WhatsAppMessage,
@@ -62,8 +63,11 @@ interface DemoState {
   telegramPending: { intent: TelegramIntent } | null;
   isAuthenticated: boolean;
   lastBookedAppointmentId: string | null;
+  openSlots: OpenSlot[];
 
   getAvailableSlots: (date: string, excludeAppointmentId?: string) => string[];
+  publishOpenSlot: (date: string, time: string) => boolean;
+  retractOpenSlot: (id: string) => void;
   bookAppointment: (input: BookAppointmentInput, locale?: Locale) => Appointment;
   confirmAppointment: (id: string, locale?: Locale) => void;
   cancelAppointment: (id: string, locale?: Locale) => void;
@@ -82,6 +86,10 @@ interface DemoState {
   telegramSend: (text: string) => void;
   telegramConfirmPending: (locale?: Locale) => void;
   telegramCancelPending: () => void;
+}
+
+function consumeOpenSlot(openSlots: OpenSlot[], date: string, time: string): OpenSlot[] {
+  return openSlots.filter((s) => !(s.date === date && s.time === time));
 }
 
 function findOrCreatePatient(patients: Patient[], name: string, phone: string, email: string) {
@@ -173,14 +181,32 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   telegramPending: null,
   isAuthenticated: false,
   lastBookedAppointmentId: null,
+  openSlots: [],
 
   getAvailableSlots(date, excludeAppointmentId) {
-    const taken = get()
-      .appointments.filter(
-        (a) => a.date === date && a.status !== "cancelled" && a.id !== excludeAppointmentId
-      )
+    const state = get();
+    const taken = state.appointments
+      .filter((a) => a.date === date && a.status !== "cancelled" && a.id !== excludeAppointmentId)
       .map((a) => a.time);
-    return TIME_SLOTS.filter((t) => !taken.includes(t));
+    const openTimes = state.openSlots.filter((s) => s.date === date).map((s) => s.time);
+    const allTimes = Array.from(new Set([...TIME_SLOTS, ...openTimes]));
+    return allTimes.filter((t) => !taken.includes(t)).sort();
+  },
+
+  publishOpenSlot(date, time) {
+    const state = get();
+    const alreadyTaken = state.appointments.some(
+      (a) => a.date === date && a.time === time && a.status !== "cancelled"
+    );
+    const alreadyOpen = state.openSlots.some((s) => s.date === date && s.time === time);
+    if (alreadyTaken || alreadyOpen) return false;
+    const slot: OpenSlot = { id: uid("slot"), date, time, createdAt: nowIso() };
+    set({ openSlots: [slot, ...state.openSlots] });
+    return true;
+  },
+
+  retractOpenSlot(id) {
+    set((state) => ({ openSlots: state.openSlots.filter((s) => s.id !== id) }));
   },
 
   bookAppointment(input, locale) {
@@ -218,6 +244,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
         "calendar",
       ]),
       lastBookedAppointmentId: appointment.id,
+      openSlots: consumeOpenSlot(state.openSlots, input.date, input.time),
     });
     return appointment;
   },
@@ -291,6 +318,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
           : a
       ),
       whatsappMessages: pushMessage(state.whatsappMessages, "reschedule", text, id, appt.patientId),
+      openSlots: consumeOpenSlot(state.openSlots, date, time),
     });
   },
 
@@ -588,6 +616,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
           { type: "success", data: appointment }
         ),
         telegramPending: null,
+        openSlots: consumeOpenSlot(state.openSlots, appointment.date, appointment.time),
       });
       return;
     }
@@ -618,6 +647,7 @@ export const useDemoStore = create<DemoState>((set, get) => ({
         whatsappMessages: pushMessage(state.whatsappMessages, "reschedule", waText, apptId, appt.patientId),
         telegramMessages: pushTelegramMessage(state.telegramMessages, "bot", telegramResponses.rescheduleSuccess()),
         telegramPending: null,
+        openSlots: consumeOpenSlot(state.openSlots, date, time),
       });
       return;
     }

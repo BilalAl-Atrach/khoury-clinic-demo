@@ -61,6 +61,13 @@ export interface Patient {
   createdAt: string;
 }
 
+export interface OpenSlot {
+  id: string;
+  date: string; // ISO yyyy-mm-dd
+  time: string; // HH:mm 24h
+  createdAt: string;
+}
+
 export interface Appointment {
   id: string;
   patientId: string;
