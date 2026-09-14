@@ -81,7 +81,7 @@ export default function DashboardOverviewPage() {
         </div>
         <div className="mt-4 h-56">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorAppts" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#14213d" stopOpacity={0.35} />
