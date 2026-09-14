@@ -1,26 +1,212 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf7f2;
+  --foreground: #1c1b19;
+
+  --card: #ffffff;
+  --card-foreground: #1c1b19;
+
+  --popover: #ffffff;
+  --popover-foreground: #1c1b19;
+
+  --primary: #14213d;
+  --primary-foreground: #faf7f2;
+
+  --secondary: #efe7d8;
+  --secondary-foreground: #1c1b19;
+
+  --muted: #f1ece3;
+  --muted-foreground: #6b6459;
+
+  --accent: #c9a96a;
+  --accent-foreground: #1c1b19;
+
+  --gold: #c9a96a;
+  --gold-light: #e4d3ab;
+  --navy: #14213d;
+  --navy-light: #223357;
+  --charcoal: #1c1b19;
+  --ivory: #faf7f2;
+  --beige: #efe7d8;
+
+  --destructive: #b5453a;
+  --destructive-foreground: #faf7f2;
+
+  --success: #4c7a5b;
+  --border: #e4dccb;
+  --input: #e4dccb;
+  --ring: #c9a96a;
+
+  --radius: 0.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-charcoal: var(--charcoal);
+  --color-ivory: var(--ivory);
+  --color-beige: var(--beige);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-arabic: var(--font-tajawal);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, sans-serif;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-arabic), var(--font-sans), Arial, sans-serif;
+}
+
+.font-serif-display {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+html[dir="rtl"] .font-serif-display {
+  font-family: var(--font-arabic), Georgia, serif;
+}
+
+::selection {
+  background: var(--gold-light);
+  color: var(--charcoal);
+}
+
+.container-premium {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .container-premium {
+    padding-inline: 2rem;
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.bg-grain {
+  background-image: radial-gradient(circle at 1px 1px, rgba(20, 33, 61, 0.06) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.25s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
+
+[data-radix-dialog-content][data-state="open"] {
+  animation: dialog-in 0.18s ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+[data-radix-popper-content-wrapper] [data-state="open"] {
+  animation: pop-in 0.15s ease-out;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
